@@ -1,3 +1,4 @@
+defaultContentLanguage: tw
 baseURL: "https://yuapa.com/"
 title: "apa blog"
 paginate: 5
@@ -110,20 +111,20 @@ params:
     threshold: 0.4
     minMatchCharLength: 0
     keys: ["title", "permalink", "summary", "content"]
-menu:
-  main:
-    - identifier: categories
-      name: categories
-      url: /categories/
-      weight: 10
-    - identifier: tags
-      name: tags
-      url: /tags/
-      weight: 20
-    - identifier: example
-      name: example.org
-      url: https://example.org
-      weight: 30
+# menu:
+#   main:
+#     - identifier: categories
+#       name: categories
+#       url: /categories/
+#       weight: 10
+#     - identifier: tags
+#       name: tags
+#       url: /tags/
+#       weight: 20
+#     - identifier: example
+#       name: example.org
+#       url: https://example.org
+#       weight: 30
 # Read: https://github.com/adityatelange/hugo-PaperMod/wiki/FAQs#using-hugos-syntax-highlighter-chroma
 pygmentsUseClasses: true
 markup:
@@ -134,3 +135,25 @@ markup:
     lineNos: true
     # noClasses: false
     style: "monokai"
+
+languages:
+  tw:
+    contentDir: content/tw
+    disabled: false
+    languageCode: zh-TW
+    languageDirection: ltr
+    languageName: 中文
+    # params:
+    #   subtitle: Referenz, Tutorials und Erklärungen
+    # title: Projekt Dokumentation
+    weight: 1
+  en:
+    contentDir: content/en
+    disabled: false
+    languageCode: en-US
+    languageDirection: ltr
+    languageName: English
+    # params:
+    #   subtitle: Reference, Tutorials, and Explanations
+    # title: Project Documentation
+    weight: 2
