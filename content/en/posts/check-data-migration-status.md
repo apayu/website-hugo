@@ -1,22 +1,21 @@
 ---
-title: "Data migration 如何確認資料狀態?"
+title: "How to check the data status during data migration?"
 date: 2023-06-30T21:50:23+08:00
 draft: false
 ---
 
-前陣子開發團隊為了要方便做 data migration，參考了[Migrating Production Data in Elixir](https://blog.appsignal.com/2020/02/25/migrating-production-data-in-elixir.html)，主要是講如何實作一個 migration 的機制，最終用起來的手感就跟 db migration 一樣方便，但每次合併 data_migration PR 後，都要在 slack 上提醒其他人本機端(local)要記得執行 data_migration，難免覺得稍嫌麻煩，覺得是不是能像是 db_migration 一樣，在執行的時候，在 server 的 log 裡面顯示訊息。
+A while ago, the development team was working on facilitation data migration. We have referred to [Migrating Production Data in Elixir](https://blog.appsignal.com/2020/02/25/migrating-production-data-in-elixir.html), which primarily discusses how to implement a data migration mechanism. The final user experience is as convenient as a db migration. After each data_migration PR is merged. A reminder should be posted on Slack to prompt others to run the data_migration locallly. It is somewhat cumbersome, and I wonder if it could be possible display a message in the server log when running, similar to db_migration.
 
-像是這樣:
+Something like this:
 
 ```
 Phoenix.Ecto.PendingMigrationError at GET /
 there are pending migrations for repo: Falcon.Repo. Try running `mix ecto.migrate` in the command line to migrate it
 ```
 
-後來透過 `PendingMigrationError` 找到 Phoenix 是如何實作這個過程，原來是透過 [phoenix_ecto](https://github.com/phoenixframework/phoenix_ecto) 來實現確認功能。
+Later, by utilizing `PendingMigrationError`. I discovered how Phoenix implements this process. It turns out that the confirmation functionality is achieved through [phoenix_ecto](https://github.com/phoenixframework/phoenix_ecto).
 
-
-在 Phoenix 專案裡面的 `endpoint.ex` 會看到這個檔案，裡面有一段 code 是這樣
+In the Phoenix project, you will find the `endpoint.ex` file where you will come across a code snippet like this:
 
 ```elixir
   # Code reloading can be explicitly enabled under the
@@ -29,7 +28,7 @@ there are pending migrations for repo: Falcon.Repo. Try running `mix ecto.migrat
   end
 ```
 
-其中 `Phoenix.Ecto.EheckRepoStatus` 就是檢查 db_migrate 的狀態，在這個 plug 你會看的 phoenix 是如何確認 db migration 的狀態
+The `Phoenix.Ecto.CheckRepoStatus` is responsible for checking the status of db_migrate. In this plug, you will see how Phoenix confirms the status of db migration.
 
 ```elixir
   def call(%Conn{} = conn, opts) do
@@ -46,7 +45,7 @@ there are pending migrations for repo: Falcon.Repo. Try running `mix ecto.migrat
   end
 ```
 
-知道 Phoenix 怎麼做的以後，我們就可以按照這個邏輯這樣做
+Now that we know how Phoenix dose it. We can implement it following the same logic.
 
 ```elixir
 defmodule MyApp.CheckDataStatus do
@@ -68,7 +67,8 @@ defmodule MyApp.CheckDataStatus do
 end
 ```
 
-然後在我們自己實作的 data_migrator 就會長這樣子
+Then, in our self-implemented data_migrator. It will look something like this:
+
 
 ```elixir
 defmodule MyApp.DataMigrator do
@@ -116,4 +116,6 @@ defmodule MyApp.DataMigrator do
 end
 ```
 
-接下來只要在 local 如果沒有執行到最新的 migration，就會出現提示訊息
+Next, if the local environment hasn't executed the latest migration, a prompt message will appear.
+
+Cool!
